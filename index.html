@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<!-- displays site properly based on user's device -->
+		<meta name="description" content="Application of ip address tracker" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/css/ol.css"
+			type="text/css"
+		/>
+		<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.3/build/ol.js"></script>
+		<link
+			rel="icon"
+			type="image/png"
+			sizes="32x32"
+			href="img/favicon-32x32.png"
+		/>
+		<link rel="stylesheet" href="css/style.css" />
+		<title>Frontend Mentor | IP Address Tracker</title>
+	</head>
+	<body>
+		<header class="header">
+			<div class="wrapper">
+				<h1 class="app-title">IP Address Tracker</h1>
+				<form class="app-form">
+					<input
+						type="text"
+						class="ip__input"
+						id="ip"
+						placeholder="Search for any IP address or domain"
+						aria-label="Enter an IP Address or domain"
+					/>
+					<button type="button" class="btn" aria-label="Search">
+						<img
+							src="img/icon-arrow.svg"
+							alt=""
+							class="btn__icon"
+						/>
+					</button>
+				</form>
+				<div class="result__box" id="result-box">
+					<div class="result__grid">
+						<div class="result__item">
+							<h2 class="result__category">IP address</h2>
+							<p class="result__text">192.212.174.101</p>
+						</div>
+						<div class="result__item">
+							<h2 class="result__category">Location</h2>
+							<p class="result__text">Brooklyn, NY 10001</p>
+						</div>
+						<div class="result__item">
+							<h2 class="result__category">Timezone</h2>
+							<p class="result__text">UTC -05:00</p>
+						</div>
+						<div class="result__item">
+							<h2 class="result__category">ISP</h2>
+							<p class="result__text">SpaceX Starlink</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+		<div class="map" id="map"></div>
+		<script src="js/app.js"></script>
+	</body>
+</html>
