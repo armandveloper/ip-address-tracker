@@ -186,9 +186,6 @@ const manageDetailsProcess = async (req) => {
 const init = async () => {
 	let ipDetails = checkIpDetailsLS();
 	if (!ipDetails) {
-		console.log(
-			'No se encuentra en el storage, entonces consultamos la api'
-		);
 		ipDetails = await getIpDetails({ type: 'ipAddress' }); // Puede devolver false
 		if (ipDetails) {
 			saveIpDetailsLS(ipDetails);
