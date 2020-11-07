@@ -1,5 +1,6 @@
-const $header = document.getElementById('header-wrapper');
-// const $map = document.getElementById('map');
+const $header = document.getElementById('header-wrapper'),
+	$form = document.getElementById('form'),
+	$inputIP = document.getElementById('input-ip');
 
 let map;
 
@@ -11,16 +12,14 @@ const saveIpDetailsLS = (ipDetails) => {
 	localStorage.setItem('ownIP', JSON.stringify(ipDetails));
 };
 
-const getIpDetails = async (ip) => {
+const getIpDetails = async ({ type, text }) => {
 	const baseURL = 'https://geo.ipify.org/api/v1';
 	let url = baseURL + '?apiKey=at_w8x0gtwjj3kHjXFtPrEm4IpVV6VDu';
-	if (ip) {
-		url += `&ipAddress=${ip}`;
+	if (text) {
+		url += `&${type}=${text}`;
 	}
 	try {
-		const response = await fetch(
-			'https://geo.ipify.org/api/v1?apiKey=at_w8x0gtwjj3kHjXFtPrEm4IpVV6VDu'
-		);
+		const response = await fetch(url);
 		const ipDetails = await response.json();
 		return ipDetails;
 	} catch (err) {
@@ -30,32 +29,6 @@ const getIpDetails = async (ip) => {
 };
 
 const loadMap = (lat, lng) => {
-	// var iconFeature = new ol.Feature({
-	// 	geometry: new ol.geom.Point([lng, lat]),
-	// 	name: 'location',
-	// 	population: 4000,
-	// 	rainfall: 500,
-	// });
-
-	// var iconStyle = new ol.style.Style({
-	// 	image: new ol.style.Icon({
-	// 		anchor: [0.5, 46],
-	// 		anchorXUnits: 'fraction',
-	// 		anchorYUnits: 'pixels',
-	// 		src: 'img/icon-location.svg',
-	// 	}),
-	// });
-	// iconFeature.setStyle(iconStyle);
-
-	// var vectorSource = new ol.source.Vector({
-	// 	features: [iconFeature],
-	// });
-
-	// var vectorLayer = new ol.layer.Vector({
-	// 	source: vectorSource,
-	// });
-	// console.log(vectorLayer);
-
 	map = new ol.Map({
 		target: 'map',
 		layers: [
@@ -68,6 +41,10 @@ const loadMap = (lat, lng) => {
 			zoom: 15,
 		}),
 	});
+	addMapMarker();
+};
+
+const addMapMarker = () => {
 	// Add the marker position
 	const center = map.getView().getCenter();
 	ol.proj.transform(center, 'EPSG:3857', 'EPSG:4326');
@@ -85,13 +62,20 @@ const loadMap = (lat, lng) => {
 	map.addLayer(pinLayer);
 };
 
+const positionMap = (lat, lng) => {
+	map.setView(
+		new ol.View({ center: ol.proj.fromLonLat([lng, lat]), zoom: 15 })
+	);
+	addMapMarker();
+};
+
 const renderResult = (ipDetails) => {
 	const {
 		ip,
 		location: { country, region, city, timezone },
 		isp,
 	} = ipDetails;
-	let resultBox;
+	let resultBox = $header.children[2];
 	if ($header.childElementCount == 2) {
 		resultBox = document.createElement('div');
 		resultBox.className = 'result__box';
@@ -121,13 +105,91 @@ const renderResult = (ipDetails) => {
 	}
 };
 
+const showAlert = (text) => {
+	const alert = document.createElement('div');
+	alert.className = 'alert__overlay';
+	alert.id = 'alert';
+	alert.innerHTML = `
+  <div class="alert">
+        <p class="alert__text">${text}</p>
+        <div class="alert__actions">
+          <button class="alert__close">Close</button>
+        </div>
+  </div>
+  `;
+	document.body.appendChild(alert);
+	alert.addEventListener('click', handleAlertClick);
+};
+
+const handleAlertClick = ({ target }) => {
+	if (
+		target.classList.contains('alert__overlay') ||
+		target.classList.contains('alert__close')
+	) {
+		dismissAlert();
+	}
+};
+
+const dismissAlert = () => {
+	const alert = document.getElementById('alert');
+	alert.addEventListener('animationend', (e) => alert.remove());
+	alert.firstElementChild.classList.add('alert--dismiss');
+};
+
+const isValidIP = (text) => {
+	return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
+		text
+	);
+};
+
+const isValidDomain = (text) => {
+	return /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(
+		text
+	);
+};
+
+const handleSubmit = (e) => {
+	e.preventDefault();
+	let text = $inputIP.value.trim();
+	if (!text) {
+		showAlert('Enter a valid IP or domain');
+		return;
+	}
+	const isIP = isValidIP(text),
+		isDomain = isValidDomain(text);
+	if (!isDomain && !isIP) {
+		showAlert('Enter a valid IP or domain');
+		return;
+	}
+	const req = { type: 'ipAddress', text };
+	if (isDomain) {
+		text = text.replace(/http:\/\/|https:\/\//, '');
+		let slashI = text.indexOf('/');
+		if (slashI > -1) {
+			text = text.substring(0, slashI);
+		}
+		req.text = text;
+		req.type = 'domain';
+	}
+	$form.reset();
+	manageDetailsProcess(req);
+};
+
+const manageDetailsProcess = async (req) => {
+	const ipDetails = await getIpDetails(req);
+	if (ipDetails) {
+		renderResult(ipDetails);
+		positionMap(ipDetails.location.lat, ipDetails.location.lng);
+	}
+};
+
 const init = async () => {
 	let ipDetails = checkIpDetailsLS();
 	if (!ipDetails) {
 		console.log(
 			'No se encuentra en el storage, entonces consultamos la api'
 		);
-		ipDetails = await getIpDetails(); // Puede devolver false
+		ipDetails = await getIpDetails({ type: 'ipAddress' }); // Puede devolver false
 		if (ipDetails) {
 			saveIpDetailsLS(ipDetails);
 		}
@@ -139,3 +201,4 @@ const init = async () => {
 };
 
 document.addEventListener('DOMContentLoaded', init);
+$form.addEventListener('submit', handleSubmit);

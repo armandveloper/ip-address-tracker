@@ -21,7 +21,7 @@ body {
 	flex-direction: column;
 }
 .wrapper {
-	max-width: calc(144rem * 2.5rem);
+	max-width: calc(144rem + (2.5rem * 2));
 	margin: 0 auto;
 	padding: 0 2.5rem;
 }
@@ -29,6 +29,11 @@ body {
 	background: url(../img/pattern-bg.png) center center / cover no-repeat;
 	height: 25rem;
 	padding: 2.5rem 0;
+}
+@media (min-width: 56.25em) {
+	.header {
+		height: 28rem;
+	}
 }
 .app-title {
 	color: #fff;
@@ -38,7 +43,9 @@ body {
 	text-align: center;
 }
 .app-form {
-	margin-top: 2rem;
+	max-width: 55rem;
+	margin: 0 auto;
+	margin-top: 3rem;
 	display: flex;
 }
 .ip__input {
@@ -73,15 +80,24 @@ body {
 .btn:focus .btn__icon {
 	transform: translateX(5px);
 }
+@media (min-width: 56.25em) {
+	.ip__input {
+		font-size: 1.8rem;
+	}
+	.btn {
+		padding: 2rem;
+	}
+}
 .result__box {
 	background-color: #fff;
 	border-radius: 1.5rem;
 	margin-top: 2rem;
 	padding: 2rem;
 	position: relative;
-	z-index: 10000;
+	z-index: 100;
 }
 .result__grid {
+	text-align: center;
 	display: grid;
 	gap: 1.5rem;
 }
@@ -89,7 +105,6 @@ body {
 	color: var(--dark-gray);
 	font-size: 1.2rem;
 	margin: 0;
-	text-align: center;
 	text-transform: uppercase;
 }
 .result__text {
@@ -97,8 +112,86 @@ body {
 	font-size: 2rem;
 	margin: 0;
 	margin-top: 0.8rem;
-	text-align: center;
+}
+@media (min-width: 56.25em) {
+	.result__box {
+		margin-top: 5rem;
+		padding: 6rem;
+	}
+	.result__grid {
+		text-align: left;
+		grid-template-columns: repeat(4, 1fr);
+	}
+	.result__category {
+		font-size: 1.4rem;
+	}
 }
 .map {
 	flex: 1;
+}
+.alert__overlay {
+	background-color: rgba(0, 0, 0, 0.4);
+	height: 100vh;
+	padding: 2.5rem;
+	width: 100vw;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 10000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.alert {
+	background-color: #fff;
+	border-radius: 1rem;
+	padding: 3rem 1.5rem;
+	max-width: 50rem;
+	width: 100%;
+	animation: zoom-in 0.3s ease forwards;
+}
+.alert--dismiss {
+	animation: zoom-out 0.3s ease forwards;
+}
+.alert__text {
+	color: var(--very-dark-gray);
+	font-size: 1.8rem;
+	font-weight: 500;
+	margin: 0;
+	text-align: center;
+}
+.alert__actions {
+	padding: 1.5rem 2rem 0;
+	display: flex;
+	justify-content: flex-end;
+}
+.alert__close {
+	background-color: transparent;
+	border: none;
+	color: hsl(233deg 45% 53%);
+	cursor: pointer;
+	font-weight: 500;
+	font-size: 1.6rem;
+	transition: transform 0.2s;
+}
+.alert__close:focus {
+	outline: none;
+	transform: scale(1.04);
+}
+
+@keyframes zoom-in {
+	from {
+		transform: scale(0);
+	}
+	to {
+		transform: scale(1);
+	}
+}
+@keyframes zoom-out {
+	from {
+		transform: scale(1);
+	}
+	to {
+		transform: scale(0);
+	}
 }
